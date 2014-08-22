@@ -1,5 +1,6 @@
 import unittest
 import math
+from molecular_quadrature import MolecularQuadrature
 
 class TestIntegrateRhoH2(unittest.TestCase):
 
@@ -15,7 +16,7 @@ class TestIntegrateRhoH2(unittest.TestCase):
     def test_integrate_rho_h2(self):
         atoms = [(0,0,0),(0,0,.74)]
         quad = MolecularQuadrature(atoms)
-        n = quad.integrate(density)
+        n = quad.integrate(self.density)
         self.assertEqual(n,2)
 
 if __name__ == '__main__':
