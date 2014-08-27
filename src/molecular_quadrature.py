@@ -1,3 +1,5 @@
+from partition import BeckeVoronoi
+
 class MolecularQuadrature:
 
     def __init__(self,atoms):
