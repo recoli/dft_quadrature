@@ -5,6 +5,7 @@ def euler_maclaurin_quad(start,end,n_points):
     weights[-1] = weights[-1]/2
     return weights,roots
 
+# We use our own because numpy doesnt get within 1e-14 for 7th order poly, unsure why
 # Credit for roots/weights: http://pomax.github.io/bezierinfo/legendre-gauss.html
 def gauss_legendre_quad(n_points):
 	if n_points == 2:

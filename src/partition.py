@@ -24,4 +24,4 @@ class BeckeVoronoi:
             self.cutoff_fns.append(make_cutoff_fn(this_atom,atoms[other_atom_idx]))
 
     def evaluate(self,r):
-        return reduce(operator.mul,(fn(r) for fn in self.cutoff_fns))
+        return reduce(operator.mul,(fn(r) for fn in self.cutoff_fns),1.0)

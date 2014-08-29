@@ -45,8 +45,3 @@ class QuadratureTest(unittest.TestCase):
             weights,roots = quad.gauss_legendre_quad(n_points)
             integral = sum(weights[m] * polys[i](roots[m]) for m in range(0,len(roots)))
             self.assertLess(abs(integral-(results[i])),1e-14)
-
-    def test_spherical_product_grid(self):
-        weights,roots = quad.gauss_legendre_quad(9)
-        integral = sum(weights[m] * polys[i](roots[m]) for m in range(0,len(roots)))
-
