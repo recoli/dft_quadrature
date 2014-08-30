@@ -3,7 +3,8 @@ import math
 import numpy as np
 import quadrature as quad 
 from slater_test_f import slater_1s
-import pdb
+import itertools
+import operator
 
 class QuadratureTest(unittest.TestCase):
 
@@ -45,3 +46,15 @@ class QuadratureTest(unittest.TestCase):
             weights,roots = quad.gauss_legendre_quad(n_points)
             integral = sum(weights[m] * polys[i](roots[m]) for m in range(0,len(roots)))
             self.assertLess(abs(integral-(results[i])),1e-14)
+
+    def test_product_grid(self): 
+        # Angular points - gauss-legendre theta with equally spaced phi
+        n_theta_points = 9
+        theta_weights,theta_roots_trans = quad.gauss_legendre_quad(n_theta_points)
+        phi_weights,phi_roots = quad.euler_maclaurin_quad(0,2*math.pi,2*n_theta_points) 
+        # Endpoint weights must be altered for angular integration
+        phi_weights[0] *= 2
+        phi_weights[-1] *= 2
+        # We transform the theta coordinate with a change of variables to gauss legendre qudrature
+        integral = sum(p[0]*p[1] for p in itertools.product(theta_weights,phi_weights))
+        self.assertLess(abs(integral - 4*math.pi),1e-14)

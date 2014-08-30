@@ -8,8 +8,8 @@ import pdb
 class MolecularQuadrature:
 
     def __init__(self,atoms):
-    	self.atoms = atoms
-    	self.weights = []
+        self.atoms = atoms
+        self.weights = []
         self.xyz = []
         self.weight_fns = [BeckeVoronoi(atoms,i) for i in range(0,len(atoms))]
 
@@ -35,27 +35,24 @@ class MolecularQuadrature:
 
         # Now translate to absolute cartesians
         for atom in atoms:
-        	for r_weight,r_root in zip(r_weights,r_roots):
-        		for theta_weight,theta_root in zip(theta_weights,theta_roots):
-	        		for phi_weight,phi_root in zip(phi_weights,phi_roots):
-	        			self.weights.append(r_weight*theta_weight*phi_weight)
-	        			x = r_root*math.sin(theta_root)*math.cos(phi_root)
-	        			y = r_root*math.sin(theta_root)*math.sin(phi_root)
-	        			z = r_root*math.cos(theta_root)
-	        			self.xyz.append(np.array((x,y,z)))
+            for r_weight,r_root in zip(r_weights,r_roots):
+                for theta_weight,theta_root in zip(theta_weights,theta_roots):
+                    for phi_weight,phi_root in zip(phi_weights,phi_roots):
+                        self.weights.append(r_weight*theta_weight*phi_weight)
+                        x = r_root*math.sin(theta_root)*math.cos(phi_root)
+                        y = r_root*math.sin(theta_root)*math.sin(phi_root)
+                        z = r_root*math.cos(theta_root)
+                        self.xyz.append(np.array((x,y,z)))
 
     def integrate(self,integrand):
-    	integral = 0
-    	# fig = plt.figure()
-    	# ax = fig.add_subplot(111, projection='3d')
-    	# ax.scatter(*zip(*self.xyz))
-    	# plt.show()
-    	for atom_idx in range(0,len(self.atoms)):
-    		for weight,point in zip(self.weights,self.xyz):
-    			abs_xyz = point + self.atoms[atom_idx]
-    			weight_fns_norm_fac = sum(weight_fn.evaluate(abs_xyz) for weight_fn in self.weight_fns)
+        integral = 0
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111, projection='3d')
+        # ax.scatter(*zip(*self.xyz))
+        # plt.show()
+        for atom_idx in range(0,len(self.atoms)):
+            for weight,point in zip(self.weights,self.xyz):
+                abs_xyz = point + self.atoms[atom_idx]
+                weight_fns_norm_fac = sum(weight_fn.evaluate(abs_xyz) for weight_fn in self.weight_fns)
                 integral += weight*(self.weight_fns[atom_idx].evaluate(abs_xyz)/float(weight_fns_norm_fac))*integrand(abs_xyz)
-		return integral    				
-
-
-
+        return integral
