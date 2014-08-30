@@ -32,6 +32,8 @@ class MolecularQuadrature:
         theta_roots = [math.acos(val) for val in theta_roots_trans]
 
         phi_weights,phi_roots = euler_maclaurin_quad(0,2*math.pi,2*n_theta_points) 
+        phi_weights[0] *= 2
+        phi_weights[-1] *= 2
 
         # Now translate to absolute cartesians
         for atom in atoms:
