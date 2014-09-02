@@ -15,7 +15,7 @@ class MolecularQuadrature:
 
         # Set up radial points
         h_becke_rad = 0.35
-        r_weights,r_roots = euler_maclaurin_quad(0,1,50)
+        r_weights,r_roots = euler_maclaurin_quad(0,1,75)
 
         # Our integrands are assumed to vanish at r = 0 and r = inf
         r_weights = r_weights[1:-2]
@@ -29,7 +29,7 @@ class MolecularQuadrature:
         r_roots = map(r_of_q,r_roots_transf)
 
         # Angular points - gauss-legendre theta equally spaced phi
-        n_theta_points = 9
+        n_theta_points = 11
         theta_weights,theta_roots_trans = gauss_legendre_quad(n_theta_points)
         theta_roots = [math.acos(val) for val in theta_roots_trans]
 

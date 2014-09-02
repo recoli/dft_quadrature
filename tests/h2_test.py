@@ -12,7 +12,7 @@ class TestIntegrateRhoH2(unittest.TestCase):
         atoms = map(np.array,[(0,0,0)])
         quad = MolecularQuadrature(atoms)
         n = quad.integrate(density)
-        self.assertEqual(n,1)
+        self.assertLess(abs(1-n),1e-14)
 
     def test_integrate_rho_h2(self):
     	density =lambda r: pow(slater_1s(1,np.array((0,0,0)))(r) + slater_1s(1,np.array((0,0,.74)))(r),2)
