@@ -4,8 +4,15 @@ from slater_test_f import slater_1s
 import numpy as np
 import pdb
 import math
+# import cProfile
+# import pstats
 
 class TestIntegrateRhoH2(unittest.TestCase):
+
+    def setUp(self):
+        pass
+        # self.pr = cProfile.Profile()
+        # self.pr.enable()
 
     def test_integrate_rho_h1(self):
     	density =lambda r: pow(slater_1s(1,np.array((0,0,0)))(r),2)
@@ -17,9 +24,14 @@ class TestIntegrateRhoH2(unittest.TestCase):
     def test_integrate_rho_h2(self):
     	density =lambda r: pow(slater_1s(1,np.array((0,0,0)))(r) + slater_1s(1,np.array((0,0,.74)))(r),2)
         atoms = map(np.array,[(0,0,0),(0,0,.74)])
-        # quad = MolecularQuadrature(atoms)
-        # n = quad.integrate(density)
-        # self.assertEqual(n,2)
+        quad = MolecularQuadrature(atoms)
+        n = quad.integrate(density)
+        self.assertEqual(n,2)
+
+    def tearDown(self):
+        pass
+        # p = pstats.Stats(self.pr)
+        # p.strip_dirs().sort_stats('cumtime').print_stats()
 
 if __name__ == '__main__':
     unittest.main()

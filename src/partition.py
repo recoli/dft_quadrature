@@ -1,5 +1,6 @@
 import numpy as np
 import operator
+import math
 
 def p(mu):
     return (float(3)/2)*mu - (float(1)/2)*pow(mu,3)

@@ -37,17 +37,16 @@ class MolecularQuadrature:
         phi_weights[0] *= 2
         phi_weights[-1] *= 2
 
-        # Now translate to absolute cartesians
-        for atom in atoms:
-            for r_weight,r_root,jacobian_val in zip(r_weights,r_roots,jacobian_vals):
-                for theta_weight,theta_root in zip(theta_weights,theta_roots):
-                    for phi_weight,phi_root in zip(phi_weights,phi_roots):
-                        weight = r_weight*theta_weight*phi_weight*pow(r_root,2)*jacobian_val
-                        self.weights.append(weight)
-                        x = r_root*math.sin(theta_root)*math.cos(phi_root)
-                        y = r_root*math.sin(theta_root)*math.sin(phi_root)
-                        z = r_root*math.cos(theta_root)
-                        self.xyz.append(np.array((x,y,z)))
+        # Convert into atom-relative cartesian coordinates
+        for r_weight,r_root,jacobian_val in zip(r_weights,r_roots,jacobian_vals):
+            for theta_weight,theta_root in zip(theta_weights,theta_roots):
+                for phi_weight,phi_root in zip(phi_weights,phi_roots):
+                    weight = r_weight*theta_weight*phi_weight*pow(r_root,2)*jacobian_val
+                    self.weights.append(weight)
+                    x = r_root*math.sin(theta_root)*math.cos(phi_root)
+                    y = r_root*math.sin(theta_root)*math.sin(phi_root)
+                    z = r_root*math.cos(theta_root)
+                    self.xyz.append(np.array((x,y,z)))
 
     def integrate(self,integrand):
         integral = 0
@@ -56,9 +55,9 @@ class MolecularQuadrature:
         # ax.scatter(*zip(*self.xyz))
         # plt.show()
         for atom_idx in range(0,len(self.atoms)):
-            for weight,point in zip(self.weights,self.xyz):
+            for quad_weight,point in zip(self.weights,self.xyz):
                 abs_xyz = point + self.atoms[atom_idx]
-                weight_fns_norm_fac = sum(weight_fn.evaluate(abs_xyz) for weight_fn in self.weight_fns)
-                #(self.weight_fns[atom_idx].evaluate(abs_xyz)/float(weight_fns_norm_fac))
-                integral += weight*integrand(abs_xyz)
+                becke_weight_norm_fac = sum(weight_fn.evaluate(abs_xyz) for weight_fn in self.weight_fns)
+                becke_weight = self.weight_fns[atom_idx].evaluate(abs_xyz)/float(becke_weight_norm_fac)
+                integral += quad_weight*becke_weight*integrand(abs_xyz)
         return integral
