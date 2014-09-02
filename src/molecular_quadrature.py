@@ -24,6 +24,8 @@ class MolecularQuadrature:
         # Change of variables to improve quadrature accuracy from Murray/Handy/Laming
         m = 2
         r_of_q = lambda q: h_becke_rad*pow(q,m)*pow(1 - q,-m)
+        jacob_of_q = lambda q: h_becke_rad*m*pow(q,m-1)*pow(1 - q,(-m)-1)
+        jacobian_vals = map(jacob_of_q,r_roots_transf)
         r_roots = map(r_of_q,r_roots_transf)
 
         # Angular points - gauss-legendre theta equally spaced phi
@@ -37,10 +39,11 @@ class MolecularQuadrature:
 
         # Now translate to absolute cartesians
         for atom in atoms:
-            for r_weight,r_root in zip(r_weights,r_roots):
+            for r_weight,r_root,jacobian_val in zip(r_weights,r_roots,jacobian_vals):
                 for theta_weight,theta_root in zip(theta_weights,theta_roots):
                     for phi_weight,phi_root in zip(phi_weights,phi_roots):
-                        self.weights.append(r_weight*theta_weight*phi_weight)
+                        weight = r_weight*theta_weight*phi_weight*pow(r_root,2)*jacobian_val
+                        self.weights.append(weight)
                         x = r_root*math.sin(theta_root)*math.cos(phi_root)
                         y = r_root*math.sin(theta_root)*math.sin(phi_root)
                         z = r_root*math.cos(theta_root)
@@ -56,5 +59,6 @@ class MolecularQuadrature:
             for weight,point in zip(self.weights,self.xyz):
                 abs_xyz = point + self.atoms[atom_idx]
                 weight_fns_norm_fac = sum(weight_fn.evaluate(abs_xyz) for weight_fn in self.weight_fns)
-                integral += weight*(self.weight_fns[atom_idx].evaluate(abs_xyz)/float(weight_fns_norm_fac))*integrand(abs_xyz)
+                #(self.weight_fns[atom_idx].evaluate(abs_xyz)/float(weight_fns_norm_fac))
+                integral += weight*integrand(abs_xyz)
         return integral
