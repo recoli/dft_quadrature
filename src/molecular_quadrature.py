@@ -3,7 +3,8 @@ from quadrature import gauss_legendre_quad,euler_maclaurin_quad
 import math
 import numpy as np
 import pdb
-# import matplotplib.pyplot as plt
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import axes3d, Axes3D
 
 class MolecularQuadrature:
 
@@ -15,7 +16,7 @@ class MolecularQuadrature:
 
         # Set up radial points
         h_becke_rad = 0.35
-        r_weights,r_roots = euler_maclaurin_quad(0,1,75)
+        r_weights,r_roots = euler_maclaurin_quad(0,1,189)
 
         # Our integrands are assumed to vanish at r = 0 and r = inf
         r_weights = r_weights[1:-2]
@@ -29,7 +30,7 @@ class MolecularQuadrature:
         r_roots = map(r_of_q,r_roots_transf)
 
         # Angular points - gauss-legendre theta equally spaced phi
-        n_theta_points = 11
+        n_theta_points = 19
         theta_weights,theta_roots_trans = gauss_legendre_quad(n_theta_points)
         theta_roots = [math.acos(val) for val in theta_roots_trans]
 
@@ -50,14 +51,21 @@ class MolecularQuadrature:
 
     def integrate(self,integrand):
         integral = 0
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111, projection='3d')
-        # ax.scatter(*zip(*self.xyz))
-        # plt.show()
+        abs_xyzs = []
         for atom_idx in range(0,len(self.atoms)):
             for quad_weight,point in zip(self.weights,self.xyz):
                 abs_xyz = point + self.atoms[atom_idx]
+                abs_xyzs.append(abs_xyz)
                 becke_weight_norm_fac = sum(weight_fn.evaluate(abs_xyz) for weight_fn in self.weight_fns)
                 becke_weight = self.weight_fns[atom_idx].evaluate(abs_xyz)/float(becke_weight_norm_fac)
                 integral += quad_weight*becke_weight*integrand(abs_xyz)
+
+        # fig = plt.figure()
+        # ax = Axes3D(fig)
+        # ax.scatter(*zip(*abs_xyzs))
+
+        # for atom,weight_fn,color in zip(self.atoms,self.weight_fns,['r','b']):
+        #     weight_fn_points = (r+atom for r in self.xyz if weight_fn.evaluate(r+atom) > 0.01)
+        #     ax.scatter(*zip(*weight_fn_points),c=color)
+        # plt.show()
         return integral
