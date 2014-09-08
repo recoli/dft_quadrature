@@ -9,23 +9,20 @@ import operator
 class QuadratureTest(unittest.TestCase):
 
     def test_euler_maclaurin(self):
-        # Becke used this instead of Bragg-Slater value of 0.25A
-        h_becke_rad = 0.35
-        weights,roots = quad.euler_maclaurin_quad(0,1,1000)
-        weights = weights[1:-2]
-        roots = roots[1:-2]
-        #print "\n".join(map(str,roots))
-        sf = slater_1s(1,np.array((0,0,0)))
-        # Change of variables to improve quadrature accuracy from Murray/Handy/Laming
-        m = 2
-        r_of_q = lambda q: h_becke_rad*pow(q,m)*pow(1 - q,-m)
-        jacob_of_q = lambda q: h_becke_rad*m*pow(q,m-1)*pow(1 - q,(-m)-1)
-        r_roots = map(r_of_q,roots)
-        #print "\n".join(map(str,r_roots))
-        jacobian_vals = map(jacob_of_q,roots)
-        quad_point_fn = lambda i: pow(r_roots[i],2)*jacobian_vals[i]*pow(sf(np.array((0,0,r_roots[i]))),2)
-        integral = 4*math.pi*sum(weights[i] * quad_point_fn(i) for i in range(0,len(weights)))
-        self.assertLess(abs(1-integral),1e-14)
+        # Define a piecewise function such that 4 points should give exact result of 5
+        def func(x):
+            if(x <= 1):
+                return 2
+            elif(x <= 2):
+                return 1
+            elif(x <= 3):
+                return 2
+            else:
+                raise ValueError("Bad x value")
+
+        weights,roots = quad.euler_maclaurin_quad(0,3,4)
+        integral = sum(weights[i]*func(roots[i]) for i in range(0,len(roots))) 
+        self.assertEqual(integral,5)
 
     def test_gauss_legendre_polynomial(self):
         # Polynomials degree 0-17 inclusive
@@ -50,11 +47,11 @@ class QuadratureTest(unittest.TestCase):
     def test_product_grid(self): 
         # Angular points - gauss-legendre theta with equally spaced phi
         n_theta_points = 9
+        n_phi_points = 2*n_theta_points
         theta_weights,theta_roots_trans = quad.gauss_legendre_quad(n_theta_points)
-        phi_weights,phi_roots = quad.euler_maclaurin_quad(0,2*math.pi,2*n_theta_points) 
-        # Endpoint weights must be altered for angular integration
-        phi_weights[0] *= 2
-        phi_weights[-1] *= 2
+        phi_roots = ((2*math.pi*i)/(n_phi_points-1) for i in range(0,n_phi_points))
+        phi_weights =  [2*math.pi/n_phi_points]*n_phi_points
+        
         # We transform the theta coordinate with a change of variables to gauss legendre qudrature
         integral = sum(p[0]*p[1] for p in itertools.product(theta_weights,phi_weights))
         self.assertLess(abs(integral - 4*math.pi),1e-14)
