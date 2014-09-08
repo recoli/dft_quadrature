@@ -43,15 +43,3 @@ class QuadratureTest(unittest.TestCase):
             weights,roots = quad.gauss_legendre_quad(n_points)
             integral = sum(weights[m] * polys[i](roots[m]) for m in range(0,len(roots)))
             self.assertLess(abs(integral-(results[i])),1e-14)
-
-    def test_product_grid(self): 
-        # Angular points - gauss-legendre theta with equally spaced phi
-        n_theta_points = 9
-        n_phi_points = 2*n_theta_points
-        theta_weights,theta_roots_trans = quad.gauss_legendre_quad(n_theta_points)
-        phi_roots = ((2*math.pi*i)/(n_phi_points-1) for i in range(0,n_phi_points))
-        phi_weights =  [2*math.pi/n_phi_points]*n_phi_points
-        
-        # We transform the theta coordinate with a change of variables to gauss legendre qudrature
-        integral = sum(p[0]*p[1] for p in itertools.product(theta_weights,phi_weights))
-        self.assertLess(abs(integral - 4*math.pi),1e-14)
