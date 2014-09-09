@@ -10,4 +10,4 @@ them in the image below, where the red points have non-negligible weight values
 with respect to the lower hydrogen and the blue points have non-negligible
 weight values with respect to the upper hydrogen (this is with an Euler-Maclaurin radial grid and a product angular grid):
 
-[!H2 atom-centered grid with Becke Partitioning](images/becke_partitioning.png)
+[!H2 atom-centered grid with Becke Partitioning](./images/becke_partitioning.png)
