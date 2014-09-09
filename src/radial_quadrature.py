@@ -13,5 +13,5 @@ def euler_maclaurin_radial_quad(n_points,alpha):
     jacob_of_q = lambda q: alpha*m*pow(q,m-1)*pow(1 - q,(-m)-1)
     jacobian_vals = map(jacob_of_q,q_roots)
     r_roots = map(r_of_q,q_roots)
-    scaled_weights = [q_weights[i]*pow(r_roots[i],2)*jacobian_vals[i] for i in range(0,len(q_roots))]
+    scaled_weights = [q_weights[i]*pow(r_roots[i],2)*jacobian_vals[i] for i in range(0,len(r_roots))]
     return scaled_weights,r_roots
